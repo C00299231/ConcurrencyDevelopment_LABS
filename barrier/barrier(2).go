@@ -19,7 +19,7 @@
 // Created on 30/9/2024
 // Modified by: Adam Noonan C00299231
 // Issues: none
-// Students Helped: Amelia Hamulewicz, Mark Lambert, Dorian Nowacki
+// Students Helped: Amelia Hamulewicz, Mark Lambert, Dorian Nowacki, Ariel Fajimiyo
 //--------------------------------------------
 
 package main
