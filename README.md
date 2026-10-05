@@ -6,6 +6,7 @@ Each program is contained in a lab folder
 - Lab 1: barrier
 - Lab 2: reusable barrier
 - Lab 3: dining philosophers problem
+- Lab 4: producer consumer
 ## How to Run
 complete the following steps to run a lab file:
 - Install [Golang](https://go.dev/doc/install) on your system

@@ -37,42 +37,47 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
-// Place a barrier in this function --use Mutex's and Semaphores
+// reusable barrier function
 func doStuff(index int, count *int, total int, inner *semaphore.Weighted, outer *semaphore.Weighted, mut *sync.Mutex, ctx *context.Context) bool {
-	time.Sleep(time.Second)
-	fmt.Println("Part A", index)
+	for range 3 {
+		time.Sleep(time.Second)
+		fmt.Println("Part A", index)
 
-	mut.Lock()
-	*count++
-	var current = *count
-	mut.Unlock()
+		mut.Lock()
+		*count++
+		var current = *count
+		mut.Unlock()
 
-	if current == total {
-		outer.Acquire(*ctx, 1)
-		inner.Release(1)
-	} else {
-		inner.Acquire(*ctx, 1)
-		inner.Release(1)
+		// last thread is allowed through
+		// effect cascades, each thread allows the next thread to continue
+		if current == total {
+			outer.Acquire(*ctx, 1)
+			inner.Release(1)
+		} else {
+			inner.Acquire(*ctx, 1)
+			inner.Release(1)
+		}
+
+		fmt.Println("PartB", index)
+
+		mut.Lock()
+		*count--
+		current = *count
+		mut.Unlock()
+
+		if current == 0 { // again, last thread allowed through
+			inner.Acquire(*ctx, 1)
+			outer.Release(1)
+		} else {
+			outer.Acquire(*ctx, 1)
+			outer.Release(1)
+		}
+		fmt.Println("PartC", index)
 	}
-
-	fmt.Println("PartB", index)
-
-	mut.Lock()
-	*count--
-	current = *count
-	mut.Unlock()
-
-	if current == 0 {
-		inner.Acquire(*ctx, 1)
-		outer.Release(1)
-	} else {
-		outer.Acquire(*ctx, 1)
-		outer.Release(1)
-	}
-	fmt.Println("PartC", index)
 	return true
 }
 
+// main
 func main() {
 	fmt.Println("program did run")
 	count := 0
