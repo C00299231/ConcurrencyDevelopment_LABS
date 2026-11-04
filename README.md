@@ -3,13 +3,15 @@ Author: Adam Noonan
 Based on work by Joseph Kehoe
 ## Navigation
 Each program is contained in a lab folder
-- Lab 1: barrier
-- Lab 2: reusable barrier
-- Lab 3: dining philosophers problem
-- Lab 4: producer consumer
+- Lab 2: go concurrency essentials lab
+- Lab 3: barrier
+- Lab 4: reusable barrier
+- Lab 5: dining philosophers problem
+- Lab 6: producer consumer
 ## How to Run
 complete the following steps to run a lab file:
 - Install [Golang](https://go.dev/doc/install) on your system
 - Install the [Go extension](https://marketplace.visualstudio.com/items?itemName=golang.go) for VSCode
-- In VSCode, navigate to the relevant Lab folder
-- Run the program
+- Open the main directory in VSCode
+- Open a terminal and `cd` to the folder containing the relevant program
+- Run the command `go run .` to execute the program
