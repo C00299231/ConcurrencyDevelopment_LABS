@@ -27,7 +27,7 @@ import (
 	"time"
 )
 
-var numThreads = 5
+const numThreads = 5
 
 // sleep for random 1-5 seconds, return amount slept, in seconds
 func waitRandomTime() int {

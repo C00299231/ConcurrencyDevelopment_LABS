@@ -34,7 +34,8 @@ import (
 )
 
 var barrier = make(chan struct{}, 1)
-var count = 0
+var count int = 0
+var total int = 10
 
 // Place a barrier in this function --use Mutex's and Semaphores
 func doStuff(goNum int, wg *sync.WaitGroup, theLock *sync.Mutex) bool {
@@ -43,7 +44,7 @@ func doStuff(goNum int, wg *sync.WaitGroup, theLock *sync.Mutex) bool {
 
 	theLock.Lock()
 	count++
-	if count == 10 {
+	if count == total {
 		barrier <- struct{}{}
 	}
 	theLock.Unlock()
@@ -59,17 +60,16 @@ func doStuff(goNum int, wg *sync.WaitGroup, theLock *sync.Mutex) bool {
 
 func main() {
 
-	totalRoutines := 10
 	var wg sync.WaitGroup
-	wg.Add(totalRoutines)
+	wg.Add(total)
 
 	// we will need some of these
 	ctx := context.TODO()
 	var theLock sync.Mutex
-	sem := semaphore.NewWeighted(int64(totalRoutines))
+	sem := semaphore.NewWeighted(int64(total))
 	sem.Acquire(ctx, 1)
 
-	for i := range totalRoutines { // create the go Routines here
+	for i := range total { // create the go Routines here
 		go doStuff(i, &wg, &theLock)
 	}
 

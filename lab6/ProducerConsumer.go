@@ -23,9 +23,6 @@ import (
 	"sync"
 )
 
-var numThreads = 10
-var bufferTotal = 10
-
 // create a worker to consume forever
 func consumer(consumerIdx int, buffer chan int) {
 	for {
@@ -45,6 +42,8 @@ func producer(producerIdx int, buffer chan int) {
 
 // main
 func main() {
+	numThreads := 10  // amount of threads to create
+	bufferTotal := 10 // size of the production buffer
 
 	buffer := make(chan int, bufferTotal)
 	var wg sync.WaitGroup
