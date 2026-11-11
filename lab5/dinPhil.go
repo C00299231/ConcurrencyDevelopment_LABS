@@ -27,11 +27,13 @@ import (
 	"time"
 )
 
+var numThreads = 5
+
 // sleep for random 1-5 seconds, return amount slept, in seconds
 func waitRandomTime() int {
 	var X time.Duration
 	var randNum = rand.IntN(5)
-	X = time.Duration(rand.IntN(5))
+	X = time.Duration(randNum)
 	time.Sleep(X * time.Second)
 	return randNum
 }
@@ -50,45 +52,53 @@ func eat(index int) {
 
 // try to acquire 2 forks, block if unavailable
 func getForks(index int, forks map[int]chan bool) {
-	if index == 0 { // first philosopher takes forks in different order, prevents deadlock
-		forks[(index+1)%5] <- true
+	// first philosopher takes forks in different order, prevents deadlock
+	// %numThreads modulo operator wraps around if index is numThreads-1
+	if index == 0 {
+		forks[(index+1)%numThreads] <- true
 		forks[index] <- true
 	} else {
 		forks[index] <- true
-		forks[(index+1)%5] <- true
+		forks[(index+1)%numThreads] <- true
 	}
 }
 
 // return forks when done eating, order doesn't matter
 func putForks(index int, forks map[int]chan bool) {
 	<-forks[index]
-	<-forks[(index+1)%5]
+	<-forks[(index+1)%numThreads]
 }
 
 // create goroutine to loop: think, access forks, eat, and return forks
 func doPhilStuff(index int, wg *sync.WaitGroup, forks map[int]chan bool) {
-	for { // think and eat forever
+	// think and eat forever
+	for {
 		think(index)
 		getForks(index, forks) // blocks if relevant forks arent available
 		eat(index)
 		putForks(index, forks) // return forks
 	}
-	wg.Done()
+	wg.Done() // will never be called
 }
 
 // main
 func main() {
+	// set up waitgroup
 	var wg sync.WaitGroup
-	philCount := 5
-	wg.Add(philCount)
+	wg.Add(numThreads)
 
+	// set up forks
 	forks := make(map[int]chan bool)
-	for k := range philCount {
-		forks[k] = make(chan bool, 1) // set up forks
+	for k := range numThreads {
+		forks[k] = make(chan bool, 1)
 	}
-	for N := range philCount {
-		go doPhilStuff(N, &wg, forks) // start philosophers
+
+	// start philosophers
+	for N := range numThreads {
+		go doPhilStuff(N, &wg, forks)
 	}
-	wg.Wait() // main thread wait here until everyone (5 go routines) is done (will never happen)
+
+	// producer & consumers run forever, so wg waits forever
+	wg.Wait()
 
 }

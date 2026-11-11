@@ -23,6 +23,9 @@ import (
 	"sync"
 )
 
+var numThreads = 10
+var bufferTotal = 10
+
 // create a worker to consume forever
 func consumer(consumerIdx int, buffer chan int) {
 	for {
@@ -42,17 +45,17 @@ func producer(producerIdx int, buffer chan int) {
 
 // main
 func main() {
-	numThreads := 10
-	bufferTotal := 10
 
 	buffer := make(chan int, bufferTotal)
 	var wg sync.WaitGroup
 	wg.Add(numThreads)
 
+	// create many consumers
 	for i := range numThreads {
-		go consumer(i, buffer) // create many consumers
+		go consumer(i, buffer)
 	}
 	go producer(0, buffer) // create one producer (maybe can create more?)
 
+	// producer & consumers run forever, so wg waits forever
 	wg.Wait()
 }
